@@ -49,9 +49,33 @@ def fulfill_wish(item):
     clear_screen()
 
 
-def change_wish():
-    # change
-    print("handle wishlist option 2")
+def change_wish(item):
+    user_input = input(
+        "\n🧞 What will your wish be now? (Press ENTER to cancel): "
+    )
+    if not user_input:
+        clear_screen()
+        return
+    api_url = "http://127.0.0.1:5000/items"
+    headers = {
+        "Accept": "application/json",
+        "content-type": "application/json",
+    }
+    payload = json.dumps(
+        {**item, "description": user_input},
+        default=wish_status_serializer,
+    )
+    try:
+        resp = requests.patch(api_url, data=payload, headers=headers)
+        resp.raise_for_status()
+        print(f"\n🧞 {get_genie_tagline()}.  Press any key to continue.")
+        wait_for_keypress()
+    except requests.exceptions.RequestException as e:
+        print(colored(f"\nSomething went wrong: {e}", "red"))
+        print(colored("\nPress any key to continue", "cyan"))
+        wait_for_keypress()
+
+    clear_screen()
 
 
 def delete_wish(item):
@@ -112,7 +136,8 @@ def run_wish_menu(item):
             fulfill_wish(item)
             break
         elif option == 2:
-            change_wish()
+            change_wish(item)
+            break
         elif option == 3:
             delete_wish(item)
             break
