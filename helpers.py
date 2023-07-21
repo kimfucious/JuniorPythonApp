@@ -41,15 +41,16 @@ def get_color():
 
 def get_genie_tagline():
     taglines = [
-        "As you wish",
         "A thousand dreams, a thousand stars",
-        "Your wish is my command",
+        "As you wish",
         "Bringing your wishes to life",
-        "Making your dreams come true",
-        "Your wishes, my magic",
-        "Wish, believe, receive",
-        "Magic at your service",
         "Dream big, wish bigger",
+        "It shall be done",
+        "Magic at your service",
+        "Making your dreams come true",
+        "Wish, believe, receive",
+        "Your wish is my command",
+        "Your wishes, my magic",
     ]
     return random.choice(taglines)
 
