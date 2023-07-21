@@ -1,34 +1,39 @@
+import data
 from enums import WishStatus
 from helpers import (
     clear_screen,
+    get_genie_tagline,
     print_ascii_art,
     quit_app,
     wait_for_keypress,
     wish_status_serializer,
-    # WishStatusEncoder,
 )
 
-# from models import PartialWish
 from termcolor import colored
 from wish_menu import run_wish_menu
 import json
 import requests
 
-wishes = []
-
 wishlist_menu_options = {
-    1: "Show Wish List",
-    2: "Make a Wish",
-    3: "Delete Wish",
-    4: "Update Wish",
-    5: "Exit Wish List",
-    6: "Quit",
+    "w": "Make another Wish",
+    "x": "Exit Wish List",
+    "q": "Quit",
+}
+
+wishlist_menu_options_no_wishes = {
+    "x": "Exit Wish List",
+    "q": "Quit",
 }
 
 
 def print_wishlist_menu():
-    for key in wishlist_menu_options.keys():
-        print(f"{key}. {wishlist_menu_options[key]}")
+    number_of_wishes = len(data.wishes)
+    if number_of_wishes == 3:
+        for key in wishlist_menu_options_no_wishes.keys():
+            print(f" {key}. {wishlist_menu_options[key]}")
+    else:
+        for key in wishlist_menu_options.keys():
+            print(f" {key}. {wishlist_menu_options[key]}")
 
 
 def get_wishes():
@@ -36,64 +41,87 @@ def get_wishes():
     headers = {"Accept": "application/json"}
     resp = requests.get(api_url, headers=headers)
     items = resp.json()
-    global wishes
-    wishes = items
-    return wishes
+    data.wishes = items
+    return data.wishes
 
 
-def wishlist_option1():
+def list_wishes():
     api_url = "http://127.0.0.1:5000/items"
     headers = {"Accept": "application/json"}
     resp = requests.get(api_url, headers=headers)
     wishes = resp.json()
     number_of_wishes = len(wishes)
-    if number_of_wishes == 0:
-        print("\n😿 You've yet to make any wishes")
-        print("\nPress any key to continue")
-        wait_for_keypress()
+    print("🙏🏽 Here are your wishes, Master:\n")
+    for i, wish in enumerate(wishes, start=1):
+        print(f" {i}. {wish['description']} ({wish['status']})")
+
+    print("\nSelect a wish by number or...\n")
+    print_wishlist_menu()
+    option = input("\nWhat is your desire?: ")
+
+    if option == "":
         clear_screen()
+    elif option.lower() == "q":
+        quit_app()
+    elif option.lower() == "w" and number_of_wishes < 3:
+        clear_screen()
+        return "w"
+    elif option.lower() == "x":
+        clear_screen()
+        return "x"
     else:
-        print("\n🙏🏽 Here are your wishes, Master:\n")
-        for i, wish in enumerate(wishes, start=1):
-            print(f"{i}. {wish['description']} ({wish['status']})")
-
-        option = input("\nSelect a Wish or Press ENTER: ")
-
-        if option == "":
-            clear_screen()
-        else:
+        try:
             option = int(option)
             if option <= number_of_wishes:
                 clear_screen()
                 run_wish_menu(wishes[option - 1])
             else:
                 clear_screen()
+        except ValueError:
+            clear_screen()
 
 
-def wishlist_option2():
-    wish_text = input("\n🧞 Make a wish: ")
+def make_a_wish():
+    wish_text = input("🧞 Make a wish ('q' to quit): ")
+    if wish_text.lower() == "q":
+        quit_app()
+    if wish_text == "":
+        print("\n🧞 Please enter a wish")
+        print("\nPress any key to continue")
+        wait_for_keypress()
+        clear_screen()
+        return
     api_url = "http://127.0.0.1:5000/items"
     headers = {
         "Accept": "application/json",
         "content-type": "application/json",
     }
-    # wish = PartialWish(description=wish_text, status=WishStatus.UNFULFILLED)
     wish = {"description": wish_text, "status": WishStatus.UNFULFILLED}
-    data = json.dumps(
+    payload = json.dumps(
         wish,
         default=wish_status_serializer,
     )
 
-    resp = requests.post(api_url, data=data, headers=headers)
-    if resp.status_code == 204:
-        print(
-            "\n🧞 Your wish is my command, Master.  Press any key to continue."
-        )
-        wait_for_keypress()
-    else:
-        print(colored("\nSomething went wrong. Please try again.", "red"))
+    try:
+        resp = requests.post(api_url, data=payload, headers=headers)
+        resp.raise_for_status()
+        data.wishes.append(resp.json())
+
+        if resp.status_code == 201:
+            print(
+                f"\n🧞 {get_genie_tagline()}.  Press any key to continue."
+            )
+            wait_for_keypress()
+        else:
+            print(colored("\nSomething went wrong. Please try again.", "red"))
+            print(colored("\nPress any key to continue", "cyan"))
+            wait_for_keypress()
+
+    except requests.exceptions.RequestException as e:
+        print(colored(f"\nSomething went wrong: {e}", "red"))
         print(colored("\nPress any key to continue", "cyan"))
         wait_for_keypress()
+
     clear_screen()
 
 
@@ -114,36 +142,18 @@ def wishlist_option6():
 
 
 def run_wishlist():
-    # get_wishes()
-    # if len(wishes) == 0:
-    #     print
-    #     clear_screen()
+    data.init()
+    get_wishes()
     while True:
-        option = ""
+        number_of_wishes = len(data.wishes)
         print_ascii_art("Wish List")
-        print_wishlist_menu()
-        try:
-            option = input("\nEnter your choice: ")
-            if option == "q":
-                quit_app()
-            else:
-                option = int(option)
-        except ValueError:
-            print(colored("\n💣 Please select a valid menu option.", "yellow"))
-            print(colored("\n Press any key to continue", "cyan"))
-            wait_for_keypress()
-            clear_screen()
-
-        if option == 1:
-            wishlist_option1()
-        elif option == 2:
-            wishlist_option2()
-        elif option == 3:
-            wishlist_option3()
-        elif option == 4:
-            wishlist_option4()
-        elif option == 5:
-            clear_screen()
-            break
-        elif option == 6:
-            quit_app()
+        if number_of_wishes == 0:
+            make_a_wish()
+        else:
+            action = list_wishes()
+            if action == "w":
+                clear_screen()
+                print_ascii_art("Wish List")
+                make_a_wish()
+            elif action == "x":
+                break

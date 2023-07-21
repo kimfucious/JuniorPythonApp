@@ -2,11 +2,13 @@ from enums import WishStatus
 from termcolor import colored
 from helpers import (
     clear_screen,
+    get_genie_tagline,
     print_ascii_art,
     quit_app,
     wait_for_keypress,
     wish_status_serializer,
 )
+import data
 import json
 import requests
 
@@ -24,22 +26,20 @@ def print_wish_menu():
         print(f"{key}. {wish_menu_options[key]}")
 
 
-def wish_option1(item):
+def fulfill_wish(item):
     api_url = "http://127.0.0.1:5000/items"
     headers = {
         "Accept": "application/json",
         "content-type": "application/json",
     }
-    data = json.dumps(
+    payload = json.dumps(
         {**item, "status": WishStatus.FULFILLED},
         default=wish_status_serializer,
     )
     try:
-        resp = requests.patch(api_url, data=data, headers=headers)
+        resp = requests.patch(api_url, data=payload, headers=headers)
         resp.raise_for_status()
-        print(
-            "\n🧞 Your wish is my command, Master.  Press any key to continue."
-        )
+        print(f"\n🧞 {get_genie_tagline()}.  Press any key to continue.")
         wait_for_keypress()
     except requests.exceptions.RequestException as e:
         print(colored(f"\nSomething went wrong: {e}", "red"))
@@ -49,12 +49,12 @@ def wish_option1(item):
     clear_screen()
 
 
-def wish_option2():
+def change_wish():
     # change
     print("handle wishlist option 2")
 
 
-def wish_option3(item):
+def delete_wish(item):
     user_input = input(
         colored(
             f"This will delete your wish, '{item['description']}'.  Are you sure? (y/N): ",  # noqa: E501
@@ -70,11 +70,15 @@ def wish_option3(item):
             }
             resp = requests.delete(api_url, headers=headers)
             resp.raise_for_status()
-            print(
-                "\n🧞 Your wish is my command, Master.  Press any key to continue."  # noqa: E501
-            )
+
+            for wish in data.wishes:
+                if item["id"] == wish["id"]:
+                    data.wishes.remove(wish)
+
+            print(f"\n🧞 {get_genie_tagline()}.  Press any key to continue.")
             wait_for_keypress()
             clear_screen()
+            return
 
         except requests.exceptions.RequestException as e:
             print(colored(f"\nSomething went wrong: {e}", "red"))
@@ -105,12 +109,12 @@ def run_wish_menu(item):
             clear_screen()
 
         if option == 1:
-            wish_option1(item)
+            fulfill_wish(item)
             break
         elif option == 2:
-            wish_option2()
+            change_wish()
         elif option == 3:
-            wish_option3(item)
+            delete_wish(item)
             break
         elif option == 4:
             clear_screen()
