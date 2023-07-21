@@ -1,6 +1,6 @@
 import cowsay
 import random
-from helpers import clear_screen
+from helpers import clear_screen, print_ascii_art
 
 chars = [
     "beavis",
@@ -31,6 +31,7 @@ def print_cowsay(text, char):
 
 def run_cowsay():
     clear_screen()
+    print_ascii_art("Cow Say")
     text = input("🐄 What does the cow say? ")
 
     if not text.strip():
