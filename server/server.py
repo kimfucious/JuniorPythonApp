@@ -1,17 +1,26 @@
+from enum import Enum
 from flask import Flask, jsonify, request
 import random
 import datetime
 
 app = Flask(__name__)
 
-# items = [
-#     {"id": 1, "name": "Knuckle Sandwich"},
-#     {"id": 2, "name": "Homemade Pizza"},
-#     {"id": 3, "name": "Hot Girlfriend"},
-#     {"id": 4, "name": "To Start All Over"},
-#     {"id": 5, "name": "Get a Job"},
-# ]
 items = []
+
+
+class WishStatus(Enum):
+    FULFILLED = "fulfilled"
+    UNFULFILLED = "unfulfilled"
+
+
+def custom_json_serializer(obj):
+    if isinstance(obj, datetime.datetime):
+        return obj.isoformat()
+    elif isinstance(obj, Enum):
+        return obj.value
+    raise TypeError(
+        "Object of type {} is not JSON serializable".format(type(obj))
+    )
 
 
 @app.route("/items")
@@ -32,7 +41,7 @@ def delete_item():
         return "Missing 'id' parameter in the query string", 422
 
     try:
-        item_id = int(item_id)  # Convert the id to an integer
+        item_id = int(item_id)
     except ValueError:
         return "Invalid 'id' parameter in the query string", 400
 
@@ -69,4 +78,4 @@ def add_item():
     new_item["created_at"] = datetime.datetime.now()
     new_item["updated_at"] = datetime.datetime.now()
     items.append(new_item)
-    return "", 204
+    return jsonify(new_item), 201
