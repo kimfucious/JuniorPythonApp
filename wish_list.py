@@ -84,7 +84,8 @@ def list_wishes():
 def make_a_wish():
     wish_text = input("🧞 Make a wish ('q' to quit): ")
     if wish_text.lower() == "q":
-        quit_app()
+        clear_screen()
+        return "q"
     if wish_text == "":
         print("\n🧞 Please enter a wish")
         print("\nPress any key to continue")
@@ -108,9 +109,7 @@ def make_a_wish():
         data.wishes.append(resp.json())
 
         if resp.status_code == 201:
-            print(
-                f"\n🧞 {get_genie_tagline()}.  Press any key to continue."
-            )
+            print(f"\n🧞 {get_genie_tagline()}.  Press any key to continue.")
             wait_for_keypress()
         else:
             print(colored("\nSomething went wrong. Please try again.", "red"))
@@ -148,7 +147,9 @@ def run_wishlist():
         number_of_wishes = len(data.wishes)
         print_ascii_art("Wish List")
         if number_of_wishes == 0:
-            make_a_wish()
+            action = make_a_wish()
+            if action == "q":
+                break
         else:
             action = list_wishes()
             if action == "w":
