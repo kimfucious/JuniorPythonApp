@@ -1,4 +1,4 @@
-import data
+from config import API_BASE_URL
 from enums import WishStatus
 from helpers import (
     clear_screen,
@@ -8,11 +8,13 @@ from helpers import (
     wait_for_keypress,
     wish_status_serializer,
 )
-
 from termcolor import colored
 from wish_menu import run_wish_menu
+import data
 import json
 import requests
+
+WISHES_URL = f"{API_BASE_URL}/wishes"
 
 wishlist_menu_options = {
     "w": "Make another Wish",
@@ -37,18 +39,16 @@ def print_wishlist_menu():
 
 
 def get_wishes():
-    api_url = "http://127.0.0.1:5000/items"
     headers = {"Accept": "application/json"}
-    resp = requests.get(api_url, headers=headers)
+    resp = requests.get(WISHES_URL, headers=headers)
     items = resp.json()
     data.wishes = items
     return data.wishes
 
 
 def list_wishes():
-    api_url = "http://127.0.0.1:5000/items"
     headers = {"Accept": "application/json"}
-    resp = requests.get(api_url, headers=headers)
+    resp = requests.get(WISHES_URL, headers=headers)
     wishes = resp.json()
     number_of_wishes = len(wishes)
     print("🙏🏽 Here are your wishes, Master:\n")
@@ -92,7 +92,6 @@ def make_a_wish():
         wait_for_keypress()
         clear_screen()
         return
-    api_url = "http://127.0.0.1:5000/items"
     headers = {
         "Accept": "application/json",
         "content-type": "application/json",
@@ -104,7 +103,7 @@ def make_a_wish():
     )
 
     try:
-        resp = requests.post(api_url, data=payload, headers=headers)
+        resp = requests.post(WISHES_URL, data=payload, headers=headers)
         resp.raise_for_status()
         data.wishes.append(resp.json())
 
