@@ -1,0 +1,29 @@
+# Use the official Python base image
+FROM python:3.9
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Install Nginx
+RUN apt-get update && apt-get install -y nginx
+
+# Install Redis
+RUN apt-get install -y redis-server
+
+# Copy the nginx.conf to the appropriate location
+COPY nginx.conf /etc/nginx/sites-available/default
+
+# Copy the requirements file to the working directory
+COPY requirements.txt .
+
+# Install the required packages using pip3
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application code to the container
+COPY . .
+
+# Expose the port that Gunicorn will listen on
+EXPOSE 8000
+
+# Start Redis server and Gunicorn with your Flask app
+CMD service redis-server start && gunicorn server:app -b 0.0.0.0:8000 -w 4
