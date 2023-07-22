@@ -10,7 +10,11 @@ from helpers import (
 )
 import data
 import json
+import os
 import requests
+
+BASE_URL = os.environ.get("API_BASE_URL")
+WISHES_URL = f"{BASE_URL}/wishes"
 
 wish_menu_options = {
     1: "Mark as fulfilled",
@@ -27,7 +31,6 @@ def print_wish_menu():
 
 
 def fulfill_wish(item):
-    api_url = "http://127.0.0.1:5000/items"
     headers = {
         "Accept": "application/json",
         "content-type": "application/json",
@@ -37,7 +40,7 @@ def fulfill_wish(item):
         default=wish_status_serializer,
     )
     try:
-        resp = requests.patch(api_url, data=payload, headers=headers)
+        resp = requests.patch(WISHES_URL, data=payload, headers=headers)
         resp.raise_for_status()
         print(f"\n🧞 {get_genie_tagline()}.  Press any key to continue.")
         wait_for_keypress()
@@ -56,7 +59,6 @@ def change_wish(item):
     if not user_input:
         clear_screen()
         return
-    api_url = "http://127.0.0.1:5000/items"
     headers = {
         "Accept": "application/json",
         "content-type": "application/json",
@@ -66,7 +68,7 @@ def change_wish(item):
         default=wish_status_serializer,
     )
     try:
-        resp = requests.patch(api_url, data=payload, headers=headers)
+        resp = requests.patch(WISHES_URL, data=payload, headers=headers)
         resp.raise_for_status()
         print(f"\n🧞 {get_genie_tagline()}.  Press any key to continue.")
         wait_for_keypress()
@@ -87,12 +89,12 @@ def delete_wish(item):
     )
     if user_input.lower() == "y":
         try:
-            api_url = f"http://127.0.0.1:5000/items?id={item['id']}"
+            url = f"{WISHES_URL}?id={item['id']}"
             headers = {
                 "Accept": "application/json",
                 "content-type": "application/json",
             }
-            resp = requests.delete(api_url, headers=headers)
+            resp = requests.delete(url, headers=headers)
             resp.raise_for_status()
 
             for wish in data.wishes:
