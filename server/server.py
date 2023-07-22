@@ -1,40 +1,22 @@
-from enum import Enum
 from flask import Flask, jsonify, request
-import random
-import datetime
+from data_access import DataAccess
 
 app = Flask(__name__)
 
-items = []
+# Set (only) one of these to True, or both to False to use the wishes list
+use_redis = False
+# use_mysql = False
+# data_access = DataAccess(use_redis, use_mysql)
+data_access = DataAccess(use_redis)
 
 
-class WishStatus(Enum):
-    FULFILLED = "fulfilled"
-    UNFULFILLED = "unfulfilled"
+@app.route("/wishes")
+def get_wishes():
+    wishes = data_access.get_wishes()
+    return jsonify(wishes)
 
 
-def custom_json_serializer(obj):
-    if isinstance(obj, datetime.datetime):
-        return obj.isoformat()
-    elif isinstance(obj, Enum):
-        return obj.value
-    raise TypeError(
-        "Object of type {} is not JSON serializable".format(type(obj))
-    )
-
-
-@app.route("/items")
-def get_items():
-    return jsonify(items)
-
-
-@app.route("/rando")
-def get_rando():
-    rando = random.choice(items)
-    return jsonify(rando)
-
-
-@app.route("/items", methods=["DELETE"])
+@app.route("/wishes", methods=["DELETE"])
 def delete_item():
     item_id = request.args.get("id")
     if item_id is None:
@@ -45,37 +27,30 @@ def delete_item():
     except ValueError:
         return "Invalid 'id' parameter in the query string", 400
 
-    for item in items:
-        if item["id"] == item_id:
-            items.remove(item)
-            return "", 204
-
-    return "Item not found", 404
+    if data_access.delete_wish(item_id):
+        return "", 204
+    else:
+        return "Wish not found", 404
 
 
-@app.route("/items", methods=["PATCH"])
+@app.route("/wishes", methods=["PATCH"])
 def update_item():
     updated_item = request.get_json()
-    item_id = updated_item.get("id")
-
-    if not item_id:
-        return "Missing Params", 422
-
-    for item in items:
-        if item["id"] == item_id:
-            item.update(updated_item)
-            item["updated_at"] = datetime.datetime.now()
-            print("updated item", item)
-            break
-
-    return "", 204
+    if data_access.update_wish(updated_item):
+        return "", 204
+    else:
+        return "Wish not found", 404
 
 
-@app.route("/items", methods=["POST"])
+@app.route("/wishes", methods=["POST"])
 def add_item():
     new_item = request.get_json()
-    new_item["id"] = len(items) + 1
-    new_item["created_at"] = datetime.datetime.now()
-    new_item["updated_at"] = datetime.datetime.now()
-    items.append(new_item)
+    data_access.add_wish(new_item)
     return jsonify(new_item), 201
+
+
+if __name__ == "__main__":
+    # Use this when running in prod
+    app.run(host="0.0.0.0", port=3001)
+    # Use this when running in dev
+    # app.run(host="0.0.0.0", port=3001, debug=True)
