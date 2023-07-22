@@ -7,11 +7,11 @@ from termcolor import colored
 from wish_list import run_wishlist
 
 menu_options = {
-    1: "Dad Joke",
-    2: "Yo Mama Joke",
-    3: "Cowsay",
-    4: "Wish List",
-    5: "Quit",
+    1: "(D)ad Joke",
+    2: "(Y)o Mama Joke",
+    3: "(C)owsay",
+    4: "(W)ish List",
+    5: "(Q)uit",
 }
 
 
@@ -25,7 +25,7 @@ def print_menu():
         print(f"{key}. {menu_options[key]}")
 
 
-def option1():
+def dad_joke():
     spinner = Halo(text="\nGetting Dad Joke...", spinner="dots")
     spinner.start()
     joke = get_dad_joke()
@@ -36,7 +36,7 @@ def option1():
     clear_screen()
 
 
-def option2():
+def yo_mama_joke():
     spinner = Halo(text="\nGetting Yo mama Joke...", spinner="dots")
     spinner.start()
     joke = get_yo_mama_joke()
@@ -47,14 +47,14 @@ def option2():
     clear_screen()
 
 
-def option3():
+def cowsay():
     run_cowsay()
     print("\n🐄 Press any key to continue")
     wait_for_keypress()
     clear_screen()
 
 
-def option4():
+def wishlist():
     clear_screen()
     run_wishlist()
 
@@ -67,7 +67,15 @@ def run_menu():
         try:
             # option = int(input("\nEnter your choice: "))
             option = input("\nEnter your choice: ")
-            if option.lower() == "q":
+            if option.lower() == "d":
+                dad_joke()
+            elif option.lower() == "y":
+                yo_mama_joke()
+            elif option.lower() == "c":
+                cowsay()
+            elif option.lower() == "w":
+                wishlist()
+            elif option.lower() == "q":
                 quit_app()
             else:
                 option = int(option)
@@ -78,12 +86,12 @@ def run_menu():
             clear_screen()
 
         if option == 1:
-            option1()
+            dad_joke()
         elif option == 2:
-            option2()
+            yo_mama_joke()
         elif option == 3:
-            option3()
+            cowsay()
         elif option == 4:
-            option4()
+            wishlist()
         elif option == 5:
             quit_app()
