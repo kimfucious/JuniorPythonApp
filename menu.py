@@ -1,3 +1,4 @@
+from countries import search_country
 from cow_say import run_cowsay
 from dad_jokes import get_dad_joke
 from yo_mama import get_yo_mama_joke
@@ -16,8 +17,9 @@ menu_options = {
     1: "(D)ad Joke",
     2: "(Y)o Mama Joke",
     3: "(C)owsay",
-    4: "(W)ish List",
-    5: "(Q)uit",
+    4: "(F)ind Flag",
+    5: "(W)ish List",
+    6: "(Q)uit",
 }
 
 
@@ -62,6 +64,18 @@ def cowsay():
     clear_screen()
 
 
+def get_flag():
+    country = input("\nName a country: ")
+    print(" ")
+    spinner = Halo(text="Finding flag...", spinner="earth", interval=180)
+    spinner.start()
+    message = search_country(country)
+    spinner.stop()
+    print(f"{message} . Press any key to continue")
+    wait_for_keypress()
+    clear_screen()
+
+
 def wishlist():
     clear_screen()
     run_wishlist()
@@ -75,12 +89,16 @@ def run_menu():
         try:
             # option = int(input("\nEnter your choice: "))
             option = input("\nEnter your choice: ")
-            if option.lower() == "d":
+            if option.lower() == "":
+                clear_screen()
+            elif option.lower() == "d":
                 dad_joke()
             elif option.lower() == "y":
                 yo_mama_joke()
             elif option.lower() == "c":
                 cowsay()
+            elif option.lower() == "f":
+                get_flag()
             elif option.lower() == "w":
                 wishlist()
             elif option.lower() == "q":
@@ -100,6 +118,10 @@ def run_menu():
         elif option == 3:
             cowsay()
         elif option == 4:
-            wishlist()
+            get_flag()
         elif option == 5:
+            wishlist()
+        elif option == 6:
             quit_app()
+        else:
+            clear_screen()
