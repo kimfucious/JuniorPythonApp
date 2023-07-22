@@ -41,6 +41,8 @@ python main.py
 
 ### Using Docker
 
+It doesn't really make sense to Docker here, but it's here for demonstration purposes.
+
 Build the app with this command:
 
 ```shell
