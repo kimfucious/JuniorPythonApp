@@ -1,5 +1,5 @@
 art==6.0
-python-dotenv==0.0.5
+python-dotenv==1.0.0
 cowsay==5.0
 halo==0.0.31
 requests==2.31.0
