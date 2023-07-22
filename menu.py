@@ -87,7 +87,6 @@ def run_menu():
         print_ascii_art("App")
         print_menu()
         try:
-            # option = int(input("\nEnter your choice: "))
             option = input("\nEnter your choice: ")
             if option.lower() == "":
                 clear_screen()
