@@ -12,7 +12,7 @@ services:
     depends_on:
       - redis
       # - mysql
-    command: ["gunicorn", "server:app", "-b", "0.0.0.0:8000", "-w", "4"]
+    command: ["gunicorn", "server:app", "-b", "0.0.0.0:8000", "--access-logfile", "-", "-w", "4"]
   redis:
     image: "redis:latest"
   # mysql:
