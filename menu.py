@@ -2,7 +2,13 @@ from cow_say import run_cowsay
 from dad_jokes import get_dad_joke
 from yo_mama import get_yo_mama_joke
 from halo import Halo
-from helpers import clear_screen, print_ascii_art, quit_app, wait_for_keypress
+from helpers import (
+    clear_screen,
+    get_laugh_emoji,
+    print_ascii_art,
+    quit_app,
+    wait_for_keypress,
+)
 from termcolor import colored
 from wish_list import run_wishlist
 
@@ -26,23 +32,25 @@ def print_menu():
 
 
 def dad_joke():
-    spinner = Halo(text="\nGetting Dad Joke...", spinner="dots")
+    print(" ")
+    spinner = Halo(text="Getting Dad Joke...", spinner="dots")
     spinner.start()
     joke = get_dad_joke()
     spinner.stop()
-    print("\n" + joke + "\n")
-    print("🤣 Press any key to continue")
+    print(joke + "\n")
+    print(f"{get_laugh_emoji()} Press any key to continue")
     wait_for_keypress()
     clear_screen()
 
 
 def yo_mama_joke():
-    spinner = Halo(text="\nGetting Yo mama Joke...", spinner="dots")
+    print(" ")
+    spinner = Halo(text="Getting Yo mama Joke...", spinner="dots")
     spinner.start()
     joke = get_yo_mama_joke()
     spinner.stop()
-    print("\n" + joke + "\n")
-    print("😹 Press any key to continue")
+    print(joke + "\n")
+    print(f"{get_laugh_emoji()} Press any key to continue")
     wait_for_keypress()
     clear_screen()
 

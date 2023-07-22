@@ -55,6 +55,11 @@ def get_genie_tagline():
     return random.choice(taglines)
 
 
+def get_laugh_emoji():
+    emojis = ["🤣", "😂", "😹", "😆"]
+    return random.choice(emojis)
+
+
 def print_ascii_art(text):
     color = get_color()
     word = get_adj()
