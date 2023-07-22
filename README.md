@@ -6,11 +6,12 @@ We're doing this in Python, because that's what he's learning in school.
 
 ## What's an API?
 
-An API is a thing that you can ask something of and it might answer.
+An API is a thing that you can ask something of, and it might answer.
 
 ### APIs used in this app
 
 -   [icanhazdadjoke](https://icanhazdadjoke.com/)
+-   [REST Countries](https://restcountries.com/#rest-countries)
 -   [The Yo Momma Joke API](https://yomomma.info/)
 -   A custom API built with Flask (for the Wish List)
 
